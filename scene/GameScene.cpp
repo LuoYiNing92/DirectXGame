@@ -7,11 +7,7 @@ using namespace DirectX;
 GameScene::GameScene() {}
 
 GameScene::~GameScene() {
-	delete sprite_;
-	delete model_;
-	if (input_->TriggerKey(DIK_SPACE)) {
-		audio_->StopWave(voiceHandle_);	
-	}
+
 }
 
 void GameScene::Initialize() {
@@ -22,23 +18,33 @@ void GameScene::Initialize() {
 	debugText_ = DebugText::GetInstance();
 
 	textureHandle_ = TextureManager::Load("mario.jpg");
-	soundDataHandle_ = audio_->LoadWave("se_sad03.wav");
-	voiceHandle_ = audio_->PlayWave(soundDataHandle_,true);
-	sprite_ = Sprite::Create(textureHandle_, {100, 50});
-	audio_->PlayWave(soundDataHandle_);
 	model_ = Model::Create();
+	worldTransform_.scale_ = {5.0f,5.0f,5.0f};
+	worldTransform_.rotation_ = {XM_PI / 4.0f, XM_PI / 4.0f, 0.0f};
+	worldTransform_.translation_ = {10.0f, 10.0f, 10.0f};
 	worldTransform_.Initialize();
 	viewProjection_.Initialize();
 }
 
-void GameScene::Update() {
-	XMFLOAT2 position = sprite_->GetPosition();
-	position.x += 2.0f;
-	position.y += 1.0f;
-	sprite_->SetPosition(position);
-	value_++;
-	std::string strDebug = std::string("Value:") + std::to_string(value_);
-	debugText_->Print(strDebug, 50, 50, 1.0f);
+void GameScene::Update() { 
+	debugText_->SetPos(50, 50);
+	debugText_->Printf(
+	  " translation:(%f,%f,%f)", 
+		worldTransform_.translation_.x, 
+		worldTransform_.translation_.y,
+	  worldTransform_.translation_.z);
+	debugText_->SetPos(50, 70);
+	debugText_->Printf(
+	  " rotation:(%f,%f,%f)", 
+		worldTransform_.rotation_.x,
+		worldTransform_.rotation_.y,
+	  worldTransform_.rotation_.z);
+	debugText_->SetPos(50, 90);
+	debugText_->Printf(
+	  " scale:(%f,%f,%f)", 
+		worldTransform_.scale_.x,
+		worldTransform_.scale_.y,
+	  worldTransform_.scale_.z);
 }
 
 void GameScene::Draw() {
@@ -79,7 +85,6 @@ void GameScene::Draw() {
 	/// <summary>
 	/// ここに前景スプライトの描画処理を追加できる
 	/// </summary>
-	sprite_->Draw();
 	// デバッグテキストの描画
 	debugText_->DrawAll(commandList);
 	//
